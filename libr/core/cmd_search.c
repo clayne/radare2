@@ -809,12 +809,31 @@ R_API RList *r_core_get_boundaries_prot(RCore *core, int perm, const char *mode,
 				append_bound (list, core->io, search_itv, addr, size, s->perm);
 			}
 		}
+	} else if (!strcmp (mode, "bin.segment")) {
+		RBinObject *obj = r_bin_cur_object (core->bin);
+		if (obj) {
+			RBinSection *s;
+			RListIter *iter;
+			r_list_foreach (obj->sections, iter, s) {
+				if (!s->add) {
+					continue;
+				}
+				ut64 addr = core->io->va? s->vaddr: s->paddr;
+				ut64 size = core->io->va? s->vsize: s->size;
+				if (R_BETWEEN (addr, core->offset, addr + size)) {
+					append_bound (list, core->io, search_itv, addr, size, s->perm);
+				}
+			}
+		}
 	} else if (!strcmp (mode, "bin.section")) {
 		RBinObject *obj = r_bin_cur_object (core->bin);
 		if (obj) {
 			RBinSection *s;
 			RListIter *iter;
 			r_list_foreach (obj->sections, iter, s) {
+				if (s->add) {
+					continue;
+				}
 				ut64 addr = core->io->va? s->vaddr: s->paddr;
 				ut64 size = core->io->va? s->vsize: s->size;
 				if (R_BETWEEN (addr, core->offset, addr + size)) {
