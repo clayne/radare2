@@ -737,25 +737,6 @@ R_API RList *r_core_get_boundaries_prot(RCore *core, int perm, const char *mode,
 			}
 			append_bound (list, core->io, search_itv, from, r_itv_size (map->itv), rwx);
 		}
-#if 0
-	} else if (r_str_startswith (mode, "bin.sections.")) {
-		int len = strlen ("bin.sections.");
-		int mask = (mode[len - 1] == '.')? r_str_rwx (mode + len): 0;
-		bool only = (bool)(size_t)strstr (mode, ".only");
-		RBinObject *obj = r_bin_cur_object (core->bin);
-		if (obj) {
-			RBinSection *s;
-			RListIter *iter;
-			r_list_foreach (obj->sections, iter, s) {
-				if (maskMatches (s->perm, mask, only)) {
-					continue;
-				}
-				ut64 addr = core->io->va? s->vaddr: s->paddr;
-				ut64 size = core->io->va? s->vsize: s->size;
-				append_bound (list, core->io, search_itv, addr, size, s->perm);
-			}
-		}
-#endif
 	} else if (r_str_startswith (mode, "io.sky.")) {
 		int len = strlen ("io.sky.");
 		int mask = (mode[len - 1] == '.')? r_str_rwx (mode + len): 0;
